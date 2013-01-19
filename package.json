@@ -12,8 +12,8 @@
         "description": "A PS3 Dualshock 3 Controller hook for Node.js powered by Node-HID.",
         "devDependencies": {},
         "keywords": ["ps3", "ds3", "dualshock 3", "node.js", "controller"],
-        "main": "mime.js",
-        "name": "mime",
+        "main": "lib/ps3.js",
+        "name": "PS3.js",
         "repository": {
                 "url": "https://github.com/KenanSulayman/PS3.js",
                 "type": "git"

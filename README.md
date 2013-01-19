@@ -69,3 +69,7 @@ Currently, I was able to determine the following structure in the data of the DS
     43: CircularAxis: Wind[L->R], Degrees. [360=>255]N.
     44: CircularAxis: WindBack:2, WindFront: 1.
     45: CiruclarAxis: Wind[B->F], Degrees. [360=>255]N.
+    46: CircularAxis: Wind<<?>>:2, Wind<<?>>: 1.
+    47: CiruclarAxis: Wind[<<?>>-><<?>>], Degrees. [360=>255]N.
+    48: CircularAxis: Wind<<?>>:2, Wind<<?>>: 1.
+    49: CiruclarAxis: Wind[<<?>>-><<?>>], Degrees. [360=>255]N.

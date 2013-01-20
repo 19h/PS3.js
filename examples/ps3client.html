@@ -1,10 +1,13 @@
 <html>
 	<head>
-		<script type="text/javascript" src="http://127.0.0.1:9532/client.js"></script>
+		<script type="text/javascript" src="http://127.0.0.1:9532/faye/client.js"></script>
 		<script type="text/javascript">
-			var client = new Faye.Client('http://127.0.0.1:9532/');
-			client.subscribe('/', function(msg) {
-				document.write(msg.data.join(", "))
+			var client = new Faye.Client('http://127.0.0.1:9532/faye');
+			client.subscribe('/faye', function(msg) {
+				p = "";
+				for ( a in msg.data)
+					p += "\t" + msg.data[a] + "\n";
+				document.body.innerHTML = "<pre>" + p + "</pre>";
 			});
 		</script>
 	</head>

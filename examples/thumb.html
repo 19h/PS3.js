@@ -1,0 +1,68 @@
+<html>
+	<head>
+		<script type="text/javascript" src="http://127.0.0.1:9532/faye/client.js"></script>
+		<script type="text/javascript">
+			var client = new Faye.Client('http://127.0.0.1:9532/faye');
+			$ = document.getElementById; e = "black"; d = "red";
+
+			Array.prototype.subsum = function () { p = []; for ( a in arguments ) p.push(this[arguments[a]]); return p; };
+
+			_sl = 10; _s = {}; _sample = function (c, k) {
+			        _s[c] || (_s[c] = []);
+			        _s[c].length < _sl ? _s[c].push(k) : _s[c] = _s[c].subsum.apply(function () {
+			                var a = _sl - 1;
+			                for (d = 1, z = []; d <= a; z.push(d), ++d);
+			                return z
+			        }());
+			        _s[c].push(k);
+			        var g = _s[c],
+			                e = [],
+			                b, h = 0,
+			                i = 0,
+			                d = 0,
+			                l = 0,
+			                a, f = 0,
+			                j = 0;
+			        if (8 <= (b = g.length)) {
+			                for (a = 0; a < b; a++) e[a] = g[a], h += e[a];
+			                for (a = 0, i = h / b; a < b; a++) d += Math.pow(e[a] - i, 2);
+			                for (a = 0, l = Math.sqrt(d / b); a < b; a++) e[a] = (e[a] - i) / l;
+			                for (a = 0; a < b; a++) 4 >= e[a] && -4 <= e[a] && (j++, f += g[a])
+			        } else for (a = 0, j = b; a < b; a++) f += g[a];
+			        return f / j
+			};
+
+			client.subscribe('/faye', function(msg) {
+				_d = msg.data;
+
+				msg.data[6] = _sample( 0, msg.data[6] )
+				msg.data[7] = _sample( 1, msg.data[7] )
+				msg.data[8] = _sample( 2, msg.data[8] )
+				msg.data[9] = _sample( 3, msg.data[9] )
+				msg.data[10] = _sample( 4, msg.data[10] )
+
+				data = msg.data.slice( 6, 10 ).map(function (v) {
+				        return v / 255
+				});
+				document.getElementById(e).style.height = ( 1 + ( _d[24] / 255 ) ) * 50;
+				document.getElementById(e).style.width = ( 1 + ( _d[24] / 255 ) ) * 50;
+				document.getElementById(d).style.height = ( 1 + ( _d[24] / 255 ) ) * 50;
+				document.getElementById(d).style.width = ( 1 + ( _d[24] / 255 ) ) * 50;
+				document.getElementById(e).style.top = ( document.body.offsetHeight * data[3] ) - parseInt(document.getElementById(e).style.height);
+				document.getElementById(e).style.left = ( document.body.offsetWidth * data[2] ) - parseInt(document.getElementById(e).style.width);
+				document.getElementById(d).style.top = ( document.body.offsetHeight * data[1] ) - parseInt(document.getElementById(d).style.height);
+				document.getElementById(d).style.left = ( document.body.offsetWidth * data[0] ) - parseInt(document.getElementById(d).style.width);
+			});
+		</script>
+		<style type="text/css">
+			* {
+				margin: 0;
+				padding: 0;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="black" style="height: 50px; width: 50px; background-color: black; position: absolute;"></div>
+		<div id="red" style="height: 50px; width: 50px; background-color: red; position: absolute;"></div>
+	</body>
+</html>

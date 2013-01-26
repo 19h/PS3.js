@@ -1,0 +1,68 @@
+<html>
+	<head>
+		<script type="text/javascript" src="http://127.0.0.1:9532/faye/client.js"></script>
+		<script type="text/javascript">
+			var client = new Faye.Client('http://127.0.0.1:9532/faye');
+
+			Array.prototype.subsum = function () { p = []; for ( a in arguments ) p.push(this[arguments[a]]); return p; };
+			Array.prototype.mean = function () { for ( a = 0, i = 0; i <= this.length - 1; (a += this[i]), ++i ); return a / this.length }
+
+			ntrvl = function ( from, to ) { for ( i = from, z = []; i <= to; z.push(i), ++i ); return z } 
+
+			$ = document.getElementById; e = "black"; var _d;
+
+			// sampling level
+			_sl = 10;
+			
+			_s = {}; _sample = function (c, k) {
+				ntrvl = function ( from, to ) { for ( i = from, z = []; i <= to; z.push(i), ++i ); return z } 
+			        _s[c] || (_s[c] = []);
+			        _s[c].length < _sl ? _s[c].push(k) : _s[c] = _s[c].subsum.apply(ntrvl(1, _sl - 1));
+			        _s[c].push(k);
+			        var f = _s[c],
+			                d = [],
+			                b, g = 0,
+			                h = 0,
+			                i = 0,
+			                l = 0,
+			                a, e = 0,
+			                j = 0;
+			        if (8 <= (b = f.length)) {
+			                for (a = 0; a < b; a++) d[a] = f[a], g += d[a];
+			                for (a = 0, h = g / b; a < b; a++) i += Math.pow(d[a] - h, 2);
+			                for (a = 0, l = Math.sqrt(i / b); a < b; a++) d[a] = (d[a] - h) / l;
+			                for (a = 0; a < b; a++) 4 >= d[a] && -4 <= d[a] && (j++, e += f[a])
+			        } else for (a = 0, j = b; a < b; a++) e += f[a];
+			        return e / j
+			};
+
+			client.subscribe('/faye', function(msg) {
+				_d = msg.data;
+
+				data = [_sample( 42, msg.data[42] ), _sample( 44, msg.data[44] )].map(function (v) { return (v - 127.5 > 0 ? v - 127.5 : v + 127.5) / 255 });
+
+				document.getElementById("state").innerHTML = [
+						msg.data[42],
+						_s[42].mean(),
+						data[0],
+						msg.data[44],
+						_s[44].mean(),
+						data[1]
+					].map(function(v){return v.toPrecision(4)}).join("<br/>");
+
+				document.getElementById(e).style.top = ( document.body.offsetHeight * data[1] ) - parseInt(document.getElementById(e).style.height);
+				document.getElementById(e).style.left = ( document.body.offsetWidth * (1 - data[0]) ) - parseInt(document.getElementById(e).style.width);
+			});
+		</script>
+		<style type="text/css">
+			* {
+				margin: 0;
+				padding: 0;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="black" style="height: 50px; width: 50px; background-color: black; position: absolute;"></div>
+		<div id="state" style="position: absolute; bottom: 10px; left: 10px; font-size: 20px"></div>
+	</body>
+</html>

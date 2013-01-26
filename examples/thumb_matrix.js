@@ -35,3 +35,10 @@ setInterval(function () {
 
         console.log( rpacket )
 }, 20)
+
+
+// ====> V8 Bug!
+
+/*data = msg.data.splice( 6, 4 ).map(function (v) {
+        return v / 255
+});*/

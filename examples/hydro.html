@@ -1,68 +1,117 @@
 <html>
-	<head>
-		<script type="text/javascript" src="http://127.0.0.1:9532/faye/client.js"></script>
-		<script type="text/javascript">
-			var client = new Faye.Client('http://127.0.0.1:9532/faye');
+        
+        <head>
+                <script type="text/javascript" src="http://127.0.0.1:9532/faye/client.js"></script>
+                <script type="text/javascript">
+                        var client = new Faye.Client('http://127.0.0.1:9532/faye');
 
-			Array.prototype.subsum = function () { p = []; for ( a in arguments ) p.push(this[arguments[a]]); return p; };
-			Array.prototype.mean = function () { for ( a = 0, i = 0; i <= this.length - 1; (a += this[i]), ++i ); return a / this.length }
+                        Array.prototype.subsum = function () {
+                                p = [];
+                                for (a in arguments) p.push(this[arguments[a]]);
+                                return p;
+                        };
+                        Array.prototype.mean = function () {
+                                for (a = 0, i = 0; i <= this.length - 1;
+                                (a += this[i]), ++i);
+                                return a / this.length
+                        }
 
-			ntrvl = function ( from, to ) { for ( i = from, z = []; i <= to; z.push(i), ++i ); return z } 
+                        ntrvl = function (from, to) {
+                                for (i = from, z = []; i <= to; z.push(i), ++i);
+                                return z
+                        }
 
-			$ = document.getElementById; e = "black"; var _d;
+                        $ = document.getElementById;
+                        e = "black";
+                        var _d;
 
-			// sampling level
-			_sl = 10;
-			
-			_s = {}; _sample = function (c, k) {
-				ntrvl = function ( from, to ) { for ( i = from, z = []; i <= to; z.push(i), ++i ); return z } 
-			        _s[c] || (_s[c] = []);
-			        _s[c].length < _sl ? _s[c].push(k) : _s[c] = _s[c].subsum.apply(ntrvl(1, _sl - 1));
-			        _s[c].push(k);
-			        var f = _s[c],
-			                d = [],
-			                b, g = 0,
-			                h = 0,
-			                i = 0,
-			                l = 0,
-			                a, e = 0,
-			                j = 0;
-			        if (8 <= (b = f.length)) {
-			                for (a = 0; a < b; a++) d[a] = f[a], g += d[a];
-			                for (a = 0, h = g / b; a < b; a++) i += Math.pow(d[a] - h, 2);
-			                for (a = 0, l = Math.sqrt(i / b); a < b; a++) d[a] = (d[a] - h) / l;
-			                for (a = 0; a < b; a++) 4 >= d[a] && -4 <= d[a] && (j++, e += f[a])
-			        } else for (a = 0, j = b; a < b; a++) e += f[a];
-			        return e / j
-			};
+                        _ = function (h, k, t) { // Math: sum, mean, variance^2, variance, standardize, outlier
+                                var _h = h instanceof Array; var _k = k instanceof Array;
 
-			client.subscribe('/faye', function(msg) {
-				_d = msg.data;
+                                if ((!_h && !_k) || (_k && _h)) return void 0; // must not return bool as would confuse
+                                else if (_k && !_h)(_k = k, k = h, h = _k);
 
-				data = [_sample( 42, msg.data[42] ), _sample( 44, msg.data[44] )].map(function (v) { return (v - 127.5 > 0 ? v - 127.5 : v + 127.5) / 255 });
+                                var s = 0, v = []; (k && h.push(k)); var _s = h.length;
 
-				document.getElementById("state").innerHTML = [
-						msg.data[42],
-						_s[42].mean(),
-						data[0],
-						msg.data[44],
-						_s[44].mean(),
-						data[1]
-					].map(function(v){return v.toPrecision(4)}).join("<br/>");
+                                var t = t || 0; var k = k || 0;
 
-				document.getElementById(e).style.top = ( document.body.offsetHeight * data[1] ) - parseInt(document.getElementById(e).style.height);
-				document.getElementById(e).style.left = ( document.body.offsetWidth * (1 - data[0]) ) - parseInt(document.getElementById(e).style.width);
-			});
-		</script>
-		<style type="text/css">
-			* {
-				margin: 0;
-				padding: 0;
-			}
-		</style>
-	</head>
-	<body>
-		<div id="black" style="height: 50px; width: 50px; background-color: black; position: absolute;"></div>
-		<div id="state" style="position: absolute; bottom: 10px; left: 10px; font-size: 20px"></div>
-	</body>
+                                if (_s < 8) return false;
+
+                                // sum
+                                for (var i = 0; i < _s; ++i) v.push(h[i]), (s += v[i]);
+                                if ( t == 1 ) return s;
+
+                                // mean
+                                var m = s / _s;
+                                if ( t == 2 ) return m;
+
+                                // variance^2
+                                for (var i = 0, _v = 0; i < _s; ++i) _v += Math.pow((v[i] - m), 2); _v = _v / _s;
+				if ( t == 3 ) return _v;
+
+                                // variance
+                                var sD = Math.sqrt(_v);
+                                if ( t == 4 ) return sD;
+
+                                // standardize
+                                for (i = 0; i < _s; ++i) v[i] = (v[i] - m) / sD;
+                                if ( t == 5 ) return v;
+
+                                // quickcheck: outlier?
+                                dRange = 1.5;
+
+                                return k ? ((k_ = v.pop()), (k_ > dRange || k_ < -dRange)) : v;
+                        }
+
+                        // history stack size
+                        _sl = 20;
+
+                        _s = {};
+                        _sample = function (c, k) {
+                                ntrvl = function (from, to) {
+                                        for (i = from, z = []; i <= to; z.push(i), ++i);
+                                        return z
+                                }
+                                _s[c] || (_s[c] = []);
+                                //if ( _(_s[c], k) ) return false;
+                                // || Math.abs(Math.max.apply(this, _s[c]) - k) > 40
+                                _s[c].length < _sl ? _s[c].push(k) : _s[c] = _s[c].subsum.apply(ntrvl(1, _sl - 1));
+                                return _s[c].push(k), _s[c].mean();
+                        };
+
+                        client.subscribe('/faye', function (msg) {
+                                _d = msg.data;
+
+                                data = [_sample(42, msg.data[42]), _sample(44, msg.data[44])].map(function (v) {
+                                        return (v - 127.5 > 0 ? v - 127.5 : v + 127.5) / 255
+                                });
+
+                                document.getElementById("state").innerHTML = [
+	                                msg.data[42],
+                                	+_(_s[42], false, 4),
+	                                data[0],
+	                                msg.data[44],
+	                                _s[44].mean(),
+                                	data[1]
+                                ].map(function (v) {
+                                        return v.toPrecision(4)
+                                }).join("<br/>");
+
+                                document.getElementById(e).style.top = (document.body.offsetHeight * data[1]) - parseInt(document.getElementById(e).style.height);
+                                document.getElementById(e).style.left = (document.body.offsetWidth * (1 - data[0])) - parseInt(document.getElementById(e).style.width);
+                        });
+                </script>
+                <style type="text/css">
+                        * {
+                                margin: 0;
+                                padding: 0;
+                        }
+                </style>
+        </head>
+        
+        <body>
+                <div id="black" style="height: 50px; width: 50px; background-color: black; position: absolute;"></div>
+                <div id="state" style="position: absolute; bottom: 10px; left: 10px; font-size: 20px"></div>
+        </body>
+
 </html>

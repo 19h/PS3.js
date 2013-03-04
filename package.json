@@ -4,7 +4,7 @@
                 "url": "http://github.com/KenanSulayman",
                 "email": "Kenan@Sulayman.org"
         },
-        "contributers": [],
+        "contributors": [],
         "dependencies": {
                 "node-hid": "*"
         },

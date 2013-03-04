@@ -12,7 +12,7 @@
         "devDependencies": {},
         "keywords": ["ps3", "ds3", "dualshock 3", "node.js", "controller"],
         "main": "lib/ps3.js",
-        "name": "PS3.js",
+        "name": "ps3.js",
         "repository": {
                 "url": "https://github.com/KenanSulayman/PS3.js",
                 "type": "git"

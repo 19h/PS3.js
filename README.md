@@ -2,7 +2,7 @@
 
 An easy wrapper around [Node-HID](https://github.com/hanshuebner/node-hid) allowing easy access to data incoming from a PS3 Dualshock 3 Controller.
 
-## Install
+## Install from Repository
 
 Clone with [git](http://git-scm.com):
 
@@ -16,7 +16,23 @@ Configure and install the dependencies with [npm](http://github.com/isaacs/npm):
 
     npm install
 
-Done!
+Done, however, if you'd like to try out the tests, proceed with:
+
+    npm install -dev
+
+in order to install the Faye-package. (or `npm install faye', do what you fancy)
+
+## Install from NPM
+
+Just power up npm and you're ready to go:
+
+    npm install ps3.js
+
+Done, however, if you'd like to try out the tests, proceed with:
+
+    npm install -dev
+
+in order to install the Faye-package. (or `npm install faye`, do what you fancy).
 
 ## Specification
 

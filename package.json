@@ -6,7 +6,7 @@
         },
         "contributors": [],
         "dependencies": {
-                "node-hid": "*",
+                "node-hid": "*"
         },
         "description": "A PS3 Dualshock 3 Controller hook for Node.js powered by Node-HID.",
         "devDependencies": {

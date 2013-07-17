@@ -1,9 +1,9 @@
 <html>
         
         <head>
-                <script type="text/javascript" src="http://127.0.0.1:9532/echtzeit/client.js"></script>
+                <script type="text/javascript" src="http://127.0.0.1:9532/srv/client.js"></script>
                 <script type="text/javascript">
-                        var client = new echtzeit.Client('http://127.0.0.1:9532/echtzeit');
+                        var client = new echtzeit.Client('http://127.0.0.1:9532/srv');
 
                         Array.prototype.subsum = function () {
                                 p = [];
@@ -79,7 +79,7 @@
                                 return _s[c].push(k), _s[c].mean();
                         };
 
-                        client.subscribe('/', function (msg) {
+                        client.subscribe('/srv', function (msg) {
                                 _d = msg.data;
 
                                 data = [_sample(42, msg.data[42]), _sample(44, msg.data[44])].map(function (v) {

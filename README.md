@@ -20,7 +20,7 @@ Done, however, if you'd like to try out the tests, proceed with:
 
     npm install -dev
 
-in order to install the Faye-package. (or `npm install faye', do what you fancy)
+in order to install the echtzeit-package. (or `npm install echtzeit', do whatever you fancy)
 
 ## Install from NPM
 

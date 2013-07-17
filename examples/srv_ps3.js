@@ -1,10 +1,13 @@
 require("../lib/ps3.js");
 
-// Hook Faye
+// Hook echtzeit
 
-var faye = require('faye'),
-	eau = new faye.NodeAdapter({mount: '/faye'});
-	eau.listen(9532);
+var http = require("http"),
+        echtzeit = require('echtzeit'),
+        srv = http.Server(),
+	eau = new echtzeit.NodeAdapter({mount: '/srv'});
+	eau.attach(srv),
+        srv.listen(9532);
 
 util = require("util");
 
@@ -14,13 +17,39 @@ log = function () {
 
 lp = +new Date;
 
-setInterval(function () {
-        eau.getClient().publish('/faye', {
-                data: rdata
+fs = require('fs');
+
+live = true;
+        record = false;
+
+if ( live ) {
+        _zp_ = [];
+
+        setInterval(function () {
+                eau.getClient().publish('/srv', {
+                        data: rdata
+                });
+                log(+new Date - lp);
+                lp = +new Date;
+                record && _zp_.push(rdata);
+        }, 10);
+        
+        record && setInterval(function () {
+                fs.writeFile("rdata", JSON.stringify(_zp_), function(err) {}); 
+        }, 10000);
+} else {
+        fs.readFile('rdata', 'utf8', function (err,data) {
+                data = JSON.parse(data);
+                i = 0;
+                setInterval(function () {
+                        eau.getClient().publish('/srv', {
+                                data: data[i++]
+                        });
+                        log(+new Date - lp);
+                        lp = +new Date;
+                }, 10)
         });
-        log(+new Date - lp);
-        lp = +new Date;
-}, 50)
+}
 
 // Provide HTTP access
 
@@ -53,8 +82,7 @@ http.createServer(function (req, res) {
                         'Content-Type': mimeType
                 });
 
-                var fileStream = fs.createReadStream(filename);
-                fileStream.pipe(res);
+                fs.createReadStream(filename).pipe(res);
 
         }); //end path.exists
 }).listen(80);

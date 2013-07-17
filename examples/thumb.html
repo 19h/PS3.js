@@ -1,13 +1,14 @@
 <html>
 	<head>
-		<script type="text/javascript" src="http://127.0.0.1:9532/faye/client.js"></script>
+		<script type="text/javascript" src="http://127.0.0.1:9532/srv/client.js"></script>
 		<script type="text/javascript">
-			var client = new Faye.Client('http://127.0.0.1:9532/faye');
+			var client = new echtzeit.Client('http://127.0.0.1:9532/srv');
 			$ = document.getElementById; e = "black"; d = "red";
 
 			Array.prototype.subsum = function () { p = []; for ( a in arguments ) p.push(this[arguments[a]]); return p; };
 
 			_sl = 10; _s = {}; _sample = function (c, k) {
+				return k;
 			        _s[c] || (_s[c] = []);
 			        _s[c].length < _sl ? _s[c].push(k) : _s[c] = _s[c].subsum.apply(function () {
 			                var a = _sl - 1;
@@ -32,7 +33,7 @@
 			        return f / j
 			};
 
-			client.subscribe('/faye', function(msg) {
+			client.subscribe('/srv', function(msg) {
 				_d = msg.data;
 
 				msg.data[6] = _sample( 0, msg.data[6] )
